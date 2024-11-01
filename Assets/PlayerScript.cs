@@ -75,7 +75,7 @@ public class PlayerScript : MonoBehaviour
     {
         RealSpeed = transform.InverseTransformDirection(rb.velocity).z; //real velocity before setting the value. This can be useful if say you want to have hair moving on the player, but don't want it to move if you are accelerating into a wall, since checking velocity after it has been applied will always be the applied value, and not real
 
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.W))
         {
             CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, Time.deltaTime * 0.5f); //speed
         }
@@ -109,13 +109,14 @@ public class PlayerScript : MonoBehaviour
         Vector3 steerDirVect; //this is used for the final rotation of the kart for steering
 
         float steerAmount;
+        Debug.Log("Drift left: " + driftLeft + " right: " + driftRight);
 
 
         if (driftLeft && !driftRight)
         {
             steerDirection = Input.GetAxis("Horizontal") < 0 ? -1.5f : -0.5f;
             transform.GetChild(0).localRotation = Quaternion.Lerp(transform.GetChild(0).localRotation, Quaternion.Euler(0, -20f, 0), 8f * Time.deltaTime);
-
+            
             
             if(isSliding && touchingGround)
                rb.AddForce(transform.right * outwardsDriftForce * Time.deltaTime, ForceMode.Acceleration);
@@ -174,11 +175,6 @@ public class PlayerScript : MonoBehaviour
 
         
 
-
-
-
-
-
         steerDirVect = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y + steerAmount, transform.eulerAngles.z);
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, steerDirVect , 3 * Time.deltaTime); 
 
@@ -214,7 +210,7 @@ public class PlayerScript : MonoBehaviour
         }
 
 
-        if (Input.GetKey(KeyCode.V) && touchingGround && CurrentSpeed > 40 && Input.GetAxis("Horizontal") != 0)
+        if (Input.GetKey(KeyCode.V) && touchingGround && CurrentSpeed > 10 && Input.GetAxis("Horizontal") != 0)
         {
             driftTime += Time.deltaTime;
 
@@ -273,7 +269,7 @@ public class PlayerScript : MonoBehaviour
             }
         }
 
-        if (!Input.GetKey(KeyCode.V) || RealSpeed < 40)
+        if (!Input.GetKey(KeyCode.V) || RealSpeed < 10)
         {
             driftLeft = false;
             driftRight = false;
@@ -344,7 +340,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-    private void tireSteer()
+    private void tireSteer() //타이어 회전
     {
         if (Input.GetKey(KeyCode.LeftArrow))
         {
