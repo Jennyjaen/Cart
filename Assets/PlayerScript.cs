@@ -107,7 +107,7 @@ public class PlayerScript : MonoBehaviour
                 }
                 else if (state.ThumbSticks.Left.Y < -0.1f)
                 {
-                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, Time.deltaTime * 0.8f * state.ThumbSticks.Left.Y);
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, Time.deltaTime * 0.8f * Mathf.Abs(state.ThumbSticks.Left.Y));
                 }
                 else
                 {
