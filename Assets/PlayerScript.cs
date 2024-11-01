@@ -2,15 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using XInputDotNetPure;
 
 public class PlayerScript : MonoBehaviour
 {
     private Rigidbody rb;
 
+    public enum InputMethod {
+        KeyBoard,
+        GamePad,
+        HandStickThrottle,
+        HandStickGesture,
+        HandStickCombine
+    }
+    public InputMethod inputMethod;
 
     private float CurrentSpeed = 0;
-    public float MaxSpeed;
-    public float boostSpeed;
+    public float MaxSpeed = 40f;
+    public float boostSpeed = 60f;
     private float RealSpeed; //not the applied speed
     [HideInInspector]
     public bool GLIDER_FLY;
@@ -50,7 +59,8 @@ public class PlayerScript : MonoBehaviour
     public Transform boostFire;
     public Transform boostExplosion;
 
-    
+    private bool drift_click = false;
+    private bool drift_button = false;
 
 
     // Start is called before the first frame update
@@ -75,18 +85,37 @@ public class PlayerScript : MonoBehaviour
     {
         RealSpeed = transform.InverseTransformDirection(rb.velocity).z; //real velocity before setting the value. This can be useful if say you want to have hair moving on the player, but don't want it to move if you are accelerating into a wall, since checking velocity after it has been applied will always be the applied value, and not real
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, Time.deltaTime * 0.5f); //speed
+        switch (inputMethod) {
+            case InputMethod.KeyBoard:
+                if (Input.GetKey(KeyCode.W)) {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, Time.deltaTime * 0.5f); //speed
+                }
+                else if (Input.GetKey(KeyCode.S)) {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, 1f * Time.deltaTime);
+                }
+                else {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, 0, Time.deltaTime * 1.5f); //speed
+                }
+                break;
+            case InputMethod.GamePad:
+                PlayerIndex playerIndex = PlayerIndex.One;
+                GamePadState state = GamePad.GetState(playerIndex); 
+
+                if (state.ThumbSticks.Left.Y > 0.1f)
+                {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, Time.deltaTime * 0.3f * state.ThumbSticks.Left.Y);
+                }
+                else if (state.ThumbSticks.Left.Y < -0.1f)
+                {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, Time.deltaTime * 0.8f * state.ThumbSticks.Left.Y);
+                }
+                else
+                {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, 0, Time.deltaTime * 1.5f);
+                }
+                break;
         }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, 1f * Time.deltaTime);
-        }
-        else
-        {
-            CurrentSpeed = Mathf.Lerp(CurrentSpeed, 0, Time.deltaTime * 1.5f); //speed
-        }
+        
 
         if (!GLIDER_FLY)
         {
@@ -109,8 +138,6 @@ public class PlayerScript : MonoBehaviour
         Vector3 steerDirVect; //this is used for the final rotation of the kart for steering
 
         float steerAmount;
-        Debug.Log("Drift left: " + driftLeft + " right: " + driftRight);
-
 
         if (driftLeft && !driftRight)
         {
@@ -137,15 +164,35 @@ public class PlayerScript : MonoBehaviour
         //since handling is supposed to be stronger when car is moving slower, we adjust steerAmount depending on the real speed of the kart, and then rotate the kart on its y axis with steerAmount
         steerAmount = RealSpeed > 30 ? RealSpeed / 4 * steerDirection : steerAmount = RealSpeed / 1.5f * steerDirection;
 
+        bool leftmove = false;
+        bool rightmove = false;
+        bool upmove = false;
+        bool downmove = false;
 
+        switch (inputMethod) {
+            case InputMethod.KeyBoard:
+                leftmove = Input.GetKey(KeyCode.LeftArrow);
+                rightmove = Input.GetKey(KeyCode.RightArrow);
+                upmove = Input.GetKey(KeyCode.UpArrow);
+                downmove =Input.GetKey(KeyCode.DownArrow) ;
+                break;
+            case InputMethod.GamePad:
+                PlayerIndex playerIndex = PlayerIndex.One; 
+                GamePadState state = GamePad.GetState(playerIndex);
+                leftmove = state.ThumbSticks.Left.X < -0.1f;
+                rightmove = state.ThumbSticks.Left.X > 0.1f;
+                upmove = state.ThumbSticks.Left.Y > 0.1f;
+                downmove = state.ThumbSticks.Left.Y < -0.1f;
+                break;
+        }
 
         //glider movements
 
-        if (Input.GetKey(KeyCode.LeftArrow) && GLIDER_FLY)  //left
+        if (leftmove && GLIDER_FLY)  //left
         {
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, 40), 2 * Time.deltaTime);          
         } // left 
-        else if (Input.GetKey(KeyCode.RightArrow) && GLIDER_FLY) //right
+        else if (rightmove && GLIDER_FLY) //right
         {
           
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, -40), 2 * Time.deltaTime);
@@ -155,14 +202,14 @@ public class PlayerScript : MonoBehaviour
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, 0), 2 * Time.deltaTime);
         } //nothing
 
-        if (Input.GetKey(KeyCode.UpArrow) && GLIDER_FLY) 
+        if (upmove && GLIDER_FLY) 
         {
             
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(25, transform.eulerAngles.y, transform.eulerAngles.z), 2 * Time.deltaTime);
             
             rb.AddForce(Vector3.down * 8000 * Time.deltaTime, ForceMode.Acceleration);
         } //moving down
-        else if (Input.GetKey(KeyCode.DownArrow) && GLIDER_FLY)  
+        else if (downmove && GLIDER_FLY)  
         {
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(-25, transform.eulerAngles.y, transform.eulerAngles.z), 2 * Time.deltaTime);
             rb.AddForce(Vector3.up * 4000 * Time.deltaTime, ForceMode.Acceleration);
@@ -194,7 +241,21 @@ public class PlayerScript : MonoBehaviour
     }
     private void drift()
     {
-        if (Input.GetKeyDown(KeyCode.V) && touchingGround)
+
+        switch (inputMethod) {
+            case InputMethod.KeyBoard:
+                drift_button = Input.GetKey(KeyCode.V);
+                drift_click = Input.GetKeyDown(KeyCode.V);
+                break;
+            case InputMethod.GamePad:
+                GamePadState state = GamePad.GetState(PlayerIndex.One);
+                bool button_state = (state.Buttons.RightShoulder == ButtonState.Pressed);
+                if(button_state && !drift_button) { drift_click = true; }
+                else { drift_click = false; }
+                drift_button = button_state;
+                break;
+        }
+        if (drift_click && touchingGround)
         {
             transform.GetChild(0).GetComponent<Animator>().SetTrigger("Hop");
             if(steerDirection > 0)
@@ -210,7 +271,7 @@ public class PlayerScript : MonoBehaviour
         }
 
 
-        if (Input.GetKey(KeyCode.V) && touchingGround && CurrentSpeed > 10 && Input.GetAxis("Horizontal") != 0)
+        if (drift_button && touchingGround && CurrentSpeed > 10 && Input.GetAxis("Horizontal") != 0)
         {
             driftTime += Time.deltaTime;
 
@@ -269,7 +330,7 @@ public class PlayerScript : MonoBehaviour
             }
         }
 
-        if (!Input.GetKey(KeyCode.V) || RealSpeed < 10)
+        if (!drift_button || RealSpeed < 10)
         {
             driftLeft = false;
             driftRight = false;
@@ -342,21 +403,47 @@ public class PlayerScript : MonoBehaviour
 
     private void tireSteer() //타이어 회전
     {
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 155, 0), 5 * Time.deltaTime);
-            frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 155, 0), 5 * Time.deltaTime);
+        switch (inputMethod) {
+            case InputMethod.KeyBoard:
+                if (Input.GetKey(KeyCode.LeftArrow))
+                    {
+                        frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 155, 0), 5 * Time.deltaTime);
+                        frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 155, 0), 5 * Time.deltaTime);
+                    }
+                    else if (Input.GetKey(KeyCode.RightArrow))
+                    {
+                        frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 205, 0), 5 * Time.deltaTime);
+                        frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 205, 0), 5 * Time.deltaTime);
+                    }
+                    else
+                    {
+                        frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 180, 0), 5 * Time.deltaTime);
+                        frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 180, 0), 5 * Time.deltaTime);
+                    }
+                break;
+            case InputMethod.GamePad:
+                PlayerIndex playerIndex = PlayerIndex.One; // 첫 번째 컨트롤러
+                GamePadState state = GamePad.GetState(playerIndex); // 현재 게임패드 상태
+                float changeSpeed = Mathf.Abs(state.ThumbSticks.Left.X * 5);
+
+                if (state.ThumbSticks.Left.X < -0.1f) // Thumbstick X축이 왼쪽으로 이동
+                {
+                    frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 155, 0), changeSpeed * Time.deltaTime);
+                    frontRightTire.localEulerAngles = Vector3.Lerp(frontRightTire.localEulerAngles, new Vector3(0, 155, 0), changeSpeed * Time.deltaTime);
+                }
+                else if (state.ThumbSticks.Left.X > 0.1f) // Thumbstick X축이 오른쪽으로 이동
+                {
+                    frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 205, 0), changeSpeed * Time.deltaTime);
+                    frontRightTire.localEulerAngles = Vector3.Lerp(frontRightTire.localEulerAngles, new Vector3(0, 205, 0), changeSpeed * Time.deltaTime);
+                }
+                else // Thumbstick이 중립에 있을 때
+                {
+                    frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 180, 0), changeSpeed * Time.deltaTime);
+                    frontRightTire.localEulerAngles = Vector3.Lerp(frontRightTire.localEulerAngles, new Vector3(0, 180, 0), changeSpeed * Time.deltaTime);
+                }
+                break;
         }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 205, 0), 5 * Time.deltaTime);
-            frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 205, 0), 5 * Time.deltaTime);
-        }
-        else
-        {
-            frontLeftTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 180, 0), 5 * Time.deltaTime);
-            frontRightTire.localEulerAngles = Vector3.Lerp(frontLeftTire.localEulerAngles, new Vector3(0, 180, 0), 5 * Time.deltaTime);
-        }
+        
 
         //tire spinning
 
