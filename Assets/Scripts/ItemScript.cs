@@ -24,7 +24,7 @@ public class ItemScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(hasItem) useItem();
     }
 
     private IEnumerator OnTriggerEnter(Collider other)
@@ -38,7 +38,7 @@ public class ItemScript : MonoBehaviour
             other.transform.GetChild(2).GetChild(2).GetComponent<SkinnedMeshRenderer>().enabled = false; //box
 
             other.gameObject.GetComponent<Animator>().SetBool("Enlarge", false); //reset to start process
-            //StartCoroutine(getItem());
+            StartCoroutine(getItem());
             ItemUIAnim.SetBool("ItemIn", true);
             ItemUiScroll.SetBool("Scroll", true);
 
@@ -60,10 +60,12 @@ public class ItemScript : MonoBehaviour
         if (!hasItem)
         {
             index = Random.Range(0, itemGameobjects.Length);
+            index = 1;
             yourSprite.sprite = itemSprites[index];
             yield return new WaitForSeconds(4f);
 
-            itemGameobjects[index].SetActive(true);
+            //itemGameobjects[index].SetActive(true);
+            //Instantiate(itemGameobjects[index],transform);
             hasItem = true;
 
         }
@@ -75,7 +77,20 @@ public class ItemScript : MonoBehaviour
             hasItem = false;
             ItemUIAnim.SetBool("ItemIn", false);
             ItemUiScroll.SetBool("Scroll", false);
-            itemGameobjects[index].SetActive(false);
+            //itemGameobjects[index].SetActive(false);
+            if (index == 0) { this.GetComponent<PlayerScript>().BoostTime = 3f; }
+            else if(index==1)
+            {
+                var shell = Instantiate(itemGameobjects[index], transform.position + transform.forward * 5f + new Vector3(0, 0.1f, 0), transform.rotation);
+                shell.SetActive(true);
+                shell.GetComponent<GreenShell>().InitialShoot(100, new Vector3(transform.forward.x, 0, transform.forward.z));
+            }
+            else
+            {
+                var bomb = Instantiate(itemGameobjects[index], transform.position + transform.forward * 10f + new Vector3(0, 0.5f, 0), transform.rotation);
+                bomb.SetActive(true);
+                //bomb.GetComponent<Bomb>().bomb_thrown(5);
+            }
         }
     }
 }
