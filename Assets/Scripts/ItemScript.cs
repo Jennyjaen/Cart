@@ -60,7 +60,7 @@ public class ItemScript : MonoBehaviour
         if (!hasItem)
         {
             index = Random.Range(0, itemGameobjects.Length);
-            index = 1;
+            //index = 2;
             yourSprite.sprite = itemSprites[index];
             yield return new WaitForSeconds(4f);
 

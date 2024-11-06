@@ -17,35 +17,30 @@ public class Bomb : MonoBehaviour
     public float bounce_count = 1;
     public float bounceForce;
     public GameObject explosion;
-    public Transform explosionPos;
-    public Transform smokePos;
-    public GameObject smoke;
+    //public Transform explosionPos;
+    //public Transform smokePos;
+    //public GameObject smoke;
 
     public SkinnedMeshRenderer[] renderers;
     public Material[] regMat;
     public Material glowMat;
-    public GameObject[] spark;
+    //public GameObject[] spark;
 
     private bool exploded = false;
     private bool landed = false;
 
-    private Transform closest_Player;
-    public Transform[] players;
+    //private Transform closest_Player;
+    //public Transform[] players;
 
     public float moveSpeed;
 
     bool countDownColor = false;
 
-    [HideInInspector]
-    public string whoThrewBomb;
-
-    float y = 0;
-
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        renderers[1].material = regMat[1];
+        //renderers[1].material = regMat[1];
         renderers[0].material = regMat[0];
         bomb_thrown(10);
     }
@@ -55,22 +50,29 @@ public class Bomb : MonoBehaviour
     {
         if(!rb)
             rb = GetComponent<Rigidbody>();
-        rb.AddRelativeForce(Vector3.down * 10000 * Time.deltaTime, ForceMode.Acceleration);
+        //rb.AddRelativeForce(Vector3.down * 10000 * Time.deltaTime, ForceMode.Acceleration);
 
-        if (landed)
+        /*if (landed)
         {
             //Move();
-            groundNormalRotation();
+            //groundNormalRotation();
             if (!countDownColor)
             {
                 StartCoroutine(countdownColor());
                 countDownColor = true;
             }
-        }
+        }*/
 
-        if (exploded)
+        /*if (exploded)
         {
             GetComponent<AudioSource>().Stop();
+        }*/
+
+        lifetime -= Time.deltaTime;
+        if (lifetime < 0 & !countDownColor) {
+            StartCoroutine(countdownColor());
+            StartCoroutine(Explode());
+            countDownColor = true;
         }
     }
     /*
@@ -117,7 +119,7 @@ public class Bomb : MonoBehaviour
     public void bomb_thrown(float extraForward)
     {
         rb.AddForce(transform.up * throwForceUp , ForceMode.Impulse);
-        rb.AddForce(-transform.forward * (throwForceForward + extraForward) , ForceMode.Impulse);
+        rb.AddForce(transform.forward * (throwForceForward + extraForward) , ForceMode.Impulse);
     }
 
 
@@ -132,25 +134,28 @@ public class Bomb : MonoBehaviour
         }
     }
 
-    private IEnumerator OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Dirt")
         {
-            groundNormalRotation();
+            //groundNormalRotation();
 
-            if (bounce_count < 4)
+            /*if (bounce_count < 1)
             {
                 rb.AddRelativeForce(transform.InverseTransformDirection(transform.up) * bounceForce / (bounce_count * 1.5f) * Time.deltaTime, ForceMode.Impulse);
                 yield return new WaitForSeconds(0.01f);
                 bounce_count++;
             }
-            if (bounce_count == 4)
+            if (bounce_count == 1)
             {
                 StartCoroutine(Explode());
                 landed = true;
             }
+            */
+            //landed = true;
+            //StartCoroutine(Explode());
         }
-        
+
         if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Opponent")
         {
             StartCoroutine(explodeImmediately());
@@ -160,25 +165,28 @@ public class Bomb : MonoBehaviour
 
     IEnumerator Explode()
     {
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(3);
         if (!exploded)
         {
-            GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
+            //GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
+            GameObject clone = Instantiate(explosion, transform.position, explosion.transform.rotation);
 
-            Instantiate(smoke, smokePos.position, smokePos.rotation);
-            for (int i = 0; i < spark.Length; i++)
+            //Instantiate(smoke, smokePos.position, smokePos.rotation);
+            /*for (int i = 0; i < spark.Length; i++)
             {
                 spark[i].SetActive(false);
-            }
+            }*/
             exploded = true;
+            gameObject.SetActive(false);
             if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
             {
                 //TODO: Player Explosion Logic
+                GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
             }
-            GetComponent<AudioSource>().Stop();
+            //GetComponent<AudioSource>().Stop();
         }
         yield return new WaitForSeconds(2);
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
 
 
 
@@ -188,33 +196,36 @@ public class Bomb : MonoBehaviour
     {
         if (!exploded)
         {
-            GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
-            Instantiate(smoke, smokePos.position, smokePos.rotation);
+            //GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
+            GameObject clone = Instantiate(explosion, transform.position, explosion.transform.rotation);
+            //Instantiate(smoke, smokePos.position, smokePos.rotation);
             for (int i = 0; i < renderers.Length; i++)
             {
                 renderers[i].enabled = false;
             }
-            for (int i = 0; i < spark.Length; i++)
+            /*for (int i = 0; i < spark.Length; i++)
             {
                 spark[i].SetActive(false);
-            }
+            }*/
             exploded = true;
+            gameObject.SetActive(false);
             if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
             {
                 //TODO: Player Explosion Logic
+                GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
             }
         }
         yield return new WaitForSeconds(2);
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
     }
 
     IEnumerator countdownColor()
     {
         while (!exploded)
         {
-            renderers[1].material = glowMat;
+            renderers[0].material = glowMat;
             yield return new WaitForSeconds(0.2f);
-            renderers[1].material = regMat[1];
+            renderers[0].material = regMat[0];
             yield return new WaitForSeconds(0.2f);
         }
     }

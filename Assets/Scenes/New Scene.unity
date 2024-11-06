@@ -156,6 +156,12 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 1507716565033929145, guid: 363f72fde03d09f45a4ad6d02e0813ae, type: 3}
+--- !u!137 &17447345 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -295371517670895584, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+    type: 3}
+  m_PrefabInstance: {fileID: 895675810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &24286309 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 8e7b08d5d3ddf7949a7d84d7dd4b7009,
@@ -6619,22 +6625,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
-  throwForceUp: 0
-  throwForceForward: 0
-  lifetime: 0
+  throwForceUp: 30
+  throwForceForward: 30
+  lifetime: 1
   bounce_count: 1
-  bounceForce: 0
-  explosion: {fileID: 0}
-  explosionPos: {fileID: 0}
-  smokePos: {fileID: 0}
-  smoke: {fileID: 0}
-  renderers: []
-  regMat: []
+  bounceForce: 10
+  explosion: {fileID: 725748389856807714, guid: 4bda94453d2ca7444a0fff05b2d425f5,
+    type: 3}
+  renderers:
+  - {fileID: 17447345}
+  regMat:
+  - {fileID: 3368776932240165681, guid: 7e14f4aefc75230409dfe56d997b8e5f, type: 3}
   glowMat: {fileID: 2100000, guid: 9289c0e475fcb9946940da36860cb5f0, type: 2}
-  spark: []
-  players: []
   moveSpeed: 0
-  whoThrewBomb: 
 --- !u!4 &826157556
 Transform:
   m_ObjectHideFlags: 0
@@ -7151,6 +7154,23 @@ PrefabInstance:
       propertyPath: m_Name
       value: ItemBomhei
       objectReference: {fileID: 0}
+    - target: {fileID: -295371517670895584, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+        type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -295371517670895584, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 3368776932240165681, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+        type: 3}
+    - target: {fileID: -295371517670895584, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+        type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 3368776932240165681, guid: 7e14f4aefc75230409dfe56d997b8e5f,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11483,7 +11503,7 @@ GameObject:
   - component: {fileID: 1616157594}
   m_Layer: 0
   m_Name: PlayerLookat
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12128,7 +12148,7 @@ GameObject:
   - component: {fileID: 1740886623}
   m_Layer: 0
   m_Name: Roads
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
