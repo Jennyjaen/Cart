@@ -35,6 +35,7 @@ public class Bomb : MonoBehaviour
     public float moveSpeed;
 
     bool countDownColor = false;
+    private EventScript status;
 
     // Start is called before the first frame update
     void Start()
@@ -43,6 +44,7 @@ public class Bomb : MonoBehaviour
         //renderers[1].material = regMat[1];
         renderers[0].material = regMat[0];
         bomb_thrown(10);
+        status = transform.GetComponent<EventScript>();
     }
 
     // Update is called once per frame
@@ -182,13 +184,19 @@ public class Bomb : MonoBehaviour
             {
                 //TODO: Player Explosion Logic
                 GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
+                if (status.situation > 1) {
+                    status.situation = 1;
+                    status.detail = 1;
+                }
             }
             //GetComponent<AudioSource>().Stop();
         }
         yield return new WaitForSeconds(2);
         //gameObject.SetActive(false);
 
-
+        //explode end
+        status.situation = 10;
+        status.detail = 10;
 
     }
 
@@ -208,15 +216,24 @@ public class Bomb : MonoBehaviour
                 spark[i].SetActive(false);
             }*/
             exploded = true;
+            
             gameObject.SetActive(false);
             if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
             {
                 //TODO: Player Explosion Logic
                 GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
+                if (status.situation > 1) {
+                    status.situation = 1;
+                    status.detail = 1;
+                }
             }
         }
         yield return new WaitForSeconds(2);
         //gameObject.SetActive(false);
+
+        //explode end
+        status.situation = 10;
+        status.detail = 10;
     }
 
     IEnumerator countdownColor()

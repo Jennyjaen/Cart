@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using XInputDotNetPure;
 
 public class ItemScript : MonoBehaviour
 {
@@ -14,11 +15,16 @@ public class ItemScript : MonoBehaviour
     public Animator ItemUiScroll;
 
     int index;
+    private PlayerScript player;
+    private GamePadState state;
+    private EventScript status;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        player = transform.GetComponent<PlayerScript>();
+        status = transform.GetComponent<EventScript>();
     }
 
     // Update is called once per frame
@@ -59,6 +65,10 @@ public class ItemScript : MonoBehaviour
     {
         if (!hasItem)
         {
+            if(status.situation > 5) {
+                status.situation = 5;
+                status.detail = 1;
+            }
             index = Random.Range(0, itemGameobjects.Length);
             //index = 2;
             yourSprite.sprite = itemSprites[index];
@@ -72,8 +82,24 @@ public class ItemScript : MonoBehaviour
     }
     public void useItem()
     {
-        if (Input.GetKeyDown(KeyCode.RightShift))
+        bool key_press = false;
+        switch (player.inputMethod) {
+            case PlayerScript.InputMethod.KeyBoard:
+                key_press = Input.GetKeyDown(KeyCode.RightShift);
+                break;
+            case PlayerScript.InputMethod.GamePad:
+                state = GamePad.GetState(PlayerIndex.One);
+                key_press = state.Buttons.LeftShoulder == ButtonState.Pressed;
+                Debug.Log(key_press);
+                break;
+
+        }
+        if (key_press)
         {
+            if (status.situation > 5) {
+                status.situation = 5;
+                status.detail = 2;
+            }
             hasItem = false;
             ItemUIAnim.SetBool("ItemIn", false);
             ItemUiScroll.SetBool("Scroll", false);
@@ -94,3 +120,6 @@ public class ItemScript : MonoBehaviour
         }
     }
 }
+
+
+    

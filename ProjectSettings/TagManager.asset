@@ -9,6 +9,11 @@ TagManager:
   - OffRoad
   - GliderPanel
   - Ground
+  - RockRoad_1
+  - RockRoad_2
+  - Grass
+  - Bump
+  - CircularBump
   layers:
   - Default
   - TransparentFX

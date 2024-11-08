@@ -61,12 +61,13 @@ public class PlayerScript : MonoBehaviour
 
     private bool drift_click = false;
     private bool drift_button = false;
-
+    private EventScript status;
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        status = transform.GetComponent<EventScript>();
     }
 
     // Update is called once per frame
@@ -471,6 +472,12 @@ public class PlayerScript : MonoBehaviour
         if(other.gameObject.tag == "GliderPanel")
         {
             GLIDER_FLY = true;
+            if (status.situation > 4) {
+                status.situation = 4;
+                if (status.detail > 2) {
+                    status.detail = 2;
+                }
+            }
             gliderAnim.SetBool("GliderOpen", true);
             gliderAnim.SetBool("GliderClose", false);
         }
@@ -480,9 +487,27 @@ public class PlayerScript : MonoBehaviour
     {
         if(collision.gameObject.tag == "Ground" || collision.gameObject.tag == "OffRoad")
         {
+            if (GLIDER_FLY) {
+                //날고 있다가 바닥에 부딪히는 경우
+                StartCoroutine(Landing());
+            }
             GLIDER_FLY = false;
             gliderAnim.SetBool("GliderOpen", false);
             gliderAnim.SetBool("GliderClose", true);
         }
     }
+
+    IEnumerator Landing() {
+        if (status.situation > 1) {
+            status.situation = 1;
+            if (status.detail > 2) {
+                status.detail = 2;
+            }
+        }
+        yield return new WaitForSeconds(3 * (rb.velocity.magnitude / 5));
+
+        status.situation = 10;
+        status.detail = 10;
+    }
+
 }
