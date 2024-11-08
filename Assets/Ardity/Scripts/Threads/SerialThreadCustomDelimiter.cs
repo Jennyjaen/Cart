@@ -49,7 +49,6 @@ public class SerialThreadBinaryDelimited : AbstractSerialThread
     protected override object ReadFromWire(SerialPort serialPort)
     {
         // Try to fill the internal buffer
-        count++;
         bufferUsed += serialPort.Read(buffer, bufferUsed, buffer.Length - bufferUsed);
 
         // Search for the separator in the buffer
