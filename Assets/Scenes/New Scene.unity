@@ -14022,7 +14022,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cab17d03ff89c2e4a92501d1e80a5e9a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputMethod: 1
+  inputMethod: 3
   MaxSpeed: 40
   boostSpeed: 60
   GLIDER_FLY: 0

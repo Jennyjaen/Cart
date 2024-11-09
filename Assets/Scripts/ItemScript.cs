@@ -92,6 +92,11 @@ public class ItemScript : MonoBehaviour
                 key_press = state.Buttons.LeftShoulder == ButtonState.Pressed;
                 Debug.Log(key_press);
                 break;
+            case PlayerScript.InputMethod.HandStickCombine:
+            case PlayerScript.InputMethod.HandStickGesture:
+                key_press = player.gestureItem;
+                player.gestureItem = false;
+                break;
 
         }
         if (key_press)

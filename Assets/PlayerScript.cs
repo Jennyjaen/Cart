@@ -3,9 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using XInputDotNetPure;
+public enum LInputGesture {
+    Default,
+    Right,
+    Left,
+}
+public enum RInputGesture {
+    Drift,
+    Item,
+    Drive,
+    Neutral,
+    Reverse,
+    NoGesture
+}
 
-public class PlayerScript : MonoBehaviour
-{
+public class PlayerScript : MonoBehaviour {
     private Rigidbody rb;
 
     public enum InputMethod {
@@ -15,6 +27,9 @@ public class PlayerScript : MonoBehaviour
         HandStickGesture,
         HandStickCombine
     }
+    private LInputGesture LgestureState=LInputGesture.Default;
+    private RInputGesture RgestureState= RInputGesture.Neutral;
+
     public InputMethod inputMethod;
 
     private float CurrentSpeed = 0;
@@ -62,6 +77,11 @@ public class PlayerScript : MonoBehaviour
     private bool drift_click = false;
     private bool drift_button = false;
     private EventScript status;
+
+    private int gestureMovement = 0; //-1,0,1
+    private bool gestureDrift = false;
+    [HideInInspector]
+    public bool gestureItem = false;
 
     // Start is called before the first frame update
     void Start()
@@ -115,6 +135,18 @@ public class PlayerScript : MonoBehaviour
                     CurrentSpeed = Mathf.Lerp(CurrentSpeed, 0, Time.deltaTime * 1.5f);
                 }
                 break;
+            case InputMethod.HandStickGesture:
+                if (gestureMovement>0) {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, Time.deltaTime * 0.5f); //speed
+                }
+                else if (gestureMovement < 0) {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, -MaxSpeed / 1.75f, 1f * Time.deltaTime);
+                }
+                else {
+                    CurrentSpeed = Mathf.Lerp(CurrentSpeed, 0, Time.deltaTime * 1.5f);
+                }
+                break;
+
         }
         
 
@@ -254,6 +286,11 @@ public class PlayerScript : MonoBehaviour
                 if(button_state && !drift_button) { drift_click = true; }
                 else { drift_click = false; }
                 drift_button = button_state;
+                break;
+            case InputMethod.HandStickGesture:
+            case InputMethod.HandStickCombine:
+                drift_click = gestureDrift && !drift_button;
+                drift_button = gestureDrift;
                 break;
         }
         if (drift_click && touchingGround)
@@ -510,4 +547,27 @@ public class PlayerScript : MonoBehaviour
         status.detail = 10;
     }
 
+    public void getRGesture(RInputGesture gesture) {
+        if(gesture!=RInputGesture.NoGesture)Debug.Log(gesture);
+        switch (gesture) {
+            case RInputGesture.Drive:
+                gestureMovement = 1;
+                break;
+            case RInputGesture.Neutral:
+                gestureMovement = 0;
+                break;
+            case RInputGesture.Reverse:
+                gestureMovement = -1;
+                break;
+            case RInputGesture.Drift:
+                gestureDrift = !gestureDrift;
+                break;
+            case RInputGesture.Item:
+                gestureItem = true;
+                break;
+            default:
+                gestureItem = false;
+                break;
+        }
+    }
 }
