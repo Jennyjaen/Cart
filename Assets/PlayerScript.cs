@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using XInputDotNetPure;
@@ -85,23 +86,82 @@ public class PlayerScript : MonoBehaviour {
 
     private float bananaTimer=0f;
 
+    public bool noCountdown = false;
+    private bool hasStarted = false;
+    private bool hasStartingBoost = true;
+    private float startTimer = 3f;
+    private float startBoostTimer = 0f;
+    [SerializeField]
+    private TextMeshProUGUI timerText;
+
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         status = transform.GetComponent<EventScript>();
+        timerText.gameObject.SetActive(!noCountdown);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        if ( !(noCountdown || hasStarted) ) {
+            countdown();
+            return;
+        }
         move();
         tireSteer();
         steer();
         groundNormalRotation();
         drift();
         boosts();
+    }
+
+    private void countdown() {
+        startTimer -= Time.deltaTime;
+        startTimer = Mathf.Max(startTimer, 0);
+        if (startTimer <= 0)
+        {
+            timerText.gameObject.SetActive(false);
+            hasStarted = true;
+            if (startBoostTimer < 2.1f && startBoostTimer>1.9f)
+            {
+                BoostTime = 2f;
+                Debug.Log("BOOST!");
+            }
+            Debug.Log(startBoostTimer);
+            return;
+        }
+        timerText.text = startTimer.ToString("0.00");
+            
+        switch (inputMethod)
+        {
+            case InputMethod.KeyBoard:
+                checkTime(Input.GetKey(KeyCode.W));
+                break;
+            case InputMethod.GamePad:
+                PlayerIndex playerIndex = PlayerIndex.One;
+                GamePadState state = GamePad.GetState(playerIndex);
+                checkTime(state.ThumbSticks.Left.Y > 0.1f);
+                break;
+            case InputMethod.HandStickGesture:
+                checkTime(gestureMovement > 0);
+                break;
+        }
+
+
+    }
+
+    private void checkTime(bool buttonPressed) {
+        if (buttonPressed)
+        {
+            startBoostTimer += Time.deltaTime;
+        }
+        else {
+            if(startTimer>0.2f)
+                startBoostTimer = 0;
+        }
     }
 
     private void move()
