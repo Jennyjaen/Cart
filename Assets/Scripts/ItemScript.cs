@@ -70,7 +70,7 @@ public class ItemScript : MonoBehaviour
                 status.detail = 1;
             }
             index = Random.Range(0, itemGameobjects.Length);
-            //index = 2;
+            //index = 3;
             yourSprite.sprite = itemSprites[index];
             yield return new WaitForSeconds(4f);
 
@@ -118,7 +118,7 @@ public class ItemScript : MonoBehaviour
             }
             else
             {
-                var bomb = Instantiate(itemGameobjects[index], transform.position + transform.forward * 10f + new Vector3(0, 0.5f, 0), transform.rotation);
+                var bomb = Instantiate(itemGameobjects[index], transform.position + transform.forward * 10f + new Vector3(0, 0.7f, 0), transform.rotation);
                 bomb.SetActive(true);
                 //bomb.GetComponent<Bomb>().bomb_thrown(5);
             }

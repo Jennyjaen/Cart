@@ -83,6 +83,9 @@ public class PlayerScript : MonoBehaviour {
     [HideInInspector]
     public bool gestureItem = false;
 
+    private float bananaTimer=0f;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -99,7 +102,6 @@ public class PlayerScript : MonoBehaviour {
         groundNormalRotation();
         drift();
         boosts();
-
     }
 
     private void move()
@@ -253,7 +255,11 @@ public class PlayerScript : MonoBehaviour {
             transform.rotation = Quaternion.SlerpUnclamped(transform.rotation, Quaternion.Euler(0, transform.eulerAngles.y, transform.eulerAngles.z), 2 * Time.deltaTime);
         }
 
-        
+        if (bananaTimer > 0)
+        {
+            steerAmount = 240;
+            bananaTimer -= Time.deltaTime;
+        }
 
         steerDirVect = new Vector3(transform.eulerAngles.x, transform.eulerAngles.y + steerAmount, transform.eulerAngles.z);
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, steerDirVect , 3 * Time.deltaTime); 
@@ -569,5 +575,9 @@ public class PlayerScript : MonoBehaviour {
                 gestureItem = false;
                 break;
         }
+    }
+
+    public void bananaSplit() {
+        bananaTimer = 0.5f;
     }
 }

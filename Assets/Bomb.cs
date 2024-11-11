@@ -44,7 +44,7 @@ public class Bomb : MonoBehaviour
         //renderers[1].material = regMat[1];
         renderers[0].material = regMat[0];
         bomb_thrown(10);
-        status = transform.GetComponent<EventScript>();
+        status = GameObject.FindGameObjectWithTag("Player").transform.GetComponent<EventScript>();
     }
 
     // Update is called once per frame
