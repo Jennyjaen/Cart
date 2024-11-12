@@ -59,7 +59,10 @@ public class Banana : MonoBehaviour
             if (status.situation > 1)
             {
                 status.situation = 1;
-                status.detail = 1;
+                if(status.detail > 4) {
+                    status.detail = 4;
+                }
+                //status.detail = 1;
             }
         }
         yield return new WaitForSeconds(2);

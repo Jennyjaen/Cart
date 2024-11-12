@@ -560,6 +560,7 @@ namespace CartoonFX
 						else
 						{
 							this.gameObject.SetActive(false);
+
 						}
 					}
 				}

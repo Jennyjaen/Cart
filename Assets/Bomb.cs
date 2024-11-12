@@ -168,6 +168,7 @@ public class Bomb : MonoBehaviour
     IEnumerator Explode()
     {
         yield return new WaitForSeconds(3);
+        Debug.Log("This script is attached to: " + gameObject.name);
         if (!exploded)
         {
             //GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
@@ -183,20 +184,20 @@ public class Bomb : MonoBehaviour
             if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
             {
                 //TODO: Player Explosion Logic
+
                 GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
                 if (status.situation > 1) {
                     status.situation = 1;
                     status.detail = 1;
                 }
             }
-            //GetComponent<AudioSource>().Stop();
         }
         yield return new WaitForSeconds(2);
-        //gameObject.SetActive(false);
 
         //explode end
         status.situation = 10;
         status.detail = 10;
+        Debug.Log("change value");
 
     }
 
@@ -204,6 +205,7 @@ public class Bomb : MonoBehaviour
     {
         if (!exploded)
         {
+            //Debug.Log("This script is attached to: " + gameObject.name);
             //GameObject clone = Instantiate(explosion, explosionPos.position, explosion.transform.rotation);
             GameObject clone = Instantiate(explosion, transform.position, explosion.transform.rotation);
             //Instantiate(smoke, smokePos.position, smokePos.rotation);
@@ -216,7 +218,6 @@ public class Bomb : MonoBehaviour
                 spark[i].SetActive(false);
             }*/
             exploded = true;
-            
             gameObject.SetActive(false);
             if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
             {
@@ -234,6 +235,7 @@ public class Bomb : MonoBehaviour
         //explode end
         status.situation = 10;
         status.detail = 10;
+        Debug.Log("change value2");
     }
 
     IEnumerator countdownColor()

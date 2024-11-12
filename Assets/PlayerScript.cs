@@ -33,7 +33,8 @@ public class PlayerScript : MonoBehaviour {
 
     public InputMethod inputMethod;
 
-    private float CurrentSpeed = 0;
+    [HideInInspector]
+    public float CurrentSpeed = 0;
     public float MaxSpeed = 40f;
     public float boostSpeed = 60f;
     private float RealSpeed; //not the applied speed
@@ -483,6 +484,10 @@ public class PlayerScript : MonoBehaviour {
         BoostTime -= Time.deltaTime;
         if(BoostTime > 0)
         {
+            if(status.situation > 2) {
+                status.situation = 2;
+                status.detail = 1;
+            }
             for(int i = 0; i < boostFire.childCount; i++)
             {
                 if (! boostFire.GetChild(i).GetComponent<ParticleSystem>().isPlaying)
@@ -494,9 +499,14 @@ public class PlayerScript : MonoBehaviour {
             MaxSpeed = boostSpeed;
 
             CurrentSpeed = Mathf.Lerp(CurrentSpeed, MaxSpeed, 1 * Time.deltaTime);
+            //Debug.Log(CurrentSpeed);
         }
         else
         {
+            if(status.situation == 2) {
+                status.situation = 10;
+                status.detail = 10;
+            }
             for (int i = 0; i < boostFire.childCount; i++)
             {
                 boostFire.GetChild(i).GetComponent<ParticleSystem>().Stop();

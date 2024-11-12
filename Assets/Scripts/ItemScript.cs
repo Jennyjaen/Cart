@@ -70,13 +70,14 @@ public class ItemScript : MonoBehaviour
                 status.detail = 1;
             }
             index = Random.Range(0, itemGameobjects.Length);
-            //index = 3;
+            index = 0;
             yourSprite.sprite = itemSprites[index];
             yield return new WaitForSeconds(4f);
 
             //itemGameobjects[index].SetActive(true);
             //Instantiate(itemGameobjects[index],transform);
             hasItem = true;
+            
 
         }
     }
@@ -90,7 +91,7 @@ public class ItemScript : MonoBehaviour
             case PlayerScript.InputMethod.GamePad:
                 state = GamePad.GetState(PlayerIndex.One);
                 key_press = state.Buttons.LeftShoulder == ButtonState.Pressed;
-                Debug.Log(key_press);
+                //Debug.Log(key_press);
                 break;
             case PlayerScript.InputMethod.HandStickCombine:
             case PlayerScript.InputMethod.HandStickGesture:
@@ -101,7 +102,7 @@ public class ItemScript : MonoBehaviour
         }
         if (key_press)
         {
-            if (status.situation > 5) {
+            if (status.situation > 5 && index != 0) {
                 status.situation = 5;
                 status.detail = 2;
             }
@@ -109,7 +110,14 @@ public class ItemScript : MonoBehaviour
             ItemUIAnim.SetBool("ItemIn", false);
             ItemUiScroll.SetBool("Scroll", false);
             //itemGameobjects[index].SetActive(false);
-            if (index == 0) { this.GetComponent<PlayerScript>().BoostTime = 3f; }
+
+            if (index == 0) { 
+                this.GetComponent<PlayerScript>().BoostTime = 3f; 
+                if(status.situation > 2) {
+                    status.situation = 2;
+                    status.detail = 1;
+                }
+            }
             else if(index==1)
             {
                 var shell = Instantiate(itemGameobjects[index], transform.position + transform.forward * 5f + new Vector3(0, 0.1f, 0), transform.rotation);
@@ -122,6 +130,8 @@ public class ItemScript : MonoBehaviour
                 bomb.SetActive(true);
                 //bomb.GetComponent<Bomb>().bomb_thrown(5);
             }
+            status.situation = 10;
+            status.detail = 10;
         }
     }
 }
