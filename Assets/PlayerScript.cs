@@ -95,6 +95,20 @@ public class PlayerScript : MonoBehaviour {
     [SerializeField]
     private TextMeshProUGUI timerText;
 
+    private enum Zone
+    {
+        None,
+        Drift,
+        Road,
+        Shell,
+        Banana,
+        Bomb, 
+        Boost,
+        Collision
+    }
+
+    [SerializeField]
+    private Zone zone;
 
     // Start is called before the first frame update
     void Start()
@@ -649,5 +663,11 @@ public class PlayerScript : MonoBehaviour {
 
     public void bananaSplit() {
         bananaTimer = 0.5f;
+    }
+
+    private void OnValidate()
+    {
+        transform.position = GameObject.Find("P_" + zone.ToString()).transform.position;
+
     }
 }
