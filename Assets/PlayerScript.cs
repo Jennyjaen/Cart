@@ -18,6 +18,18 @@ public enum RInputGesture {
     NoGesture
 }
 
+public enum Zone
+{
+    None,
+    Drift,
+    Road,
+    Boost,
+    Throw,
+    Shell,
+    Bomb,
+    Banana
+}
+
 public class PlayerScript : MonoBehaviour {
     private Rigidbody rb;
 
@@ -95,20 +107,8 @@ public class PlayerScript : MonoBehaviour {
     [SerializeField]
     private TextMeshProUGUI timerText;
 
-    private enum Zone
-    {
-        None,
-        Drift,
-        Road,
-        Shell,
-        Banana,
-        Bomb, 
-        Boost,
-        Collision
-    }
-
     [SerializeField]
-    private Zone zone;
+    public Zone zone;
 
     // Start is called before the first frame update
     void Start()
