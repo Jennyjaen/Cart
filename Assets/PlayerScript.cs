@@ -665,6 +665,11 @@ public class PlayerScript : MonoBehaviour {
         bananaTimer = 0.5f;
     }
 
+    public void itemHit(float dmg, Vector3 position, float radius) {
+        //GetComponent<Rigidbody>().AddExplosionForce(dmg, position, radius,10);
+        GetComponent<Rigidbody>().AddForce(Vector3.up * dmg, ForceMode.Impulse);
+    }
+
     private void OnValidate()
     {
         transform.position = GameObject.Find("P_" + zone.ToString()).transform.position;
