@@ -37,6 +37,8 @@ public class Bomb : MonoBehaviour
     bool countDownColor = false;
     private EventScript status;
 
+    private float explosionRadius = 15f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -179,20 +181,29 @@ public class Bomb : MonoBehaviour
             {
                 spark[i].SetActive(false);
             }*/
-            exploded = true;
-            gameObject.SetActive(false);
-            if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                renderers[i].enabled = false;
+            }
+            Debug.Log("GAAAAAAAAAAAAAAAAAAAAAAH");
+            Debug.Log(Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position));
+            if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < explosionRadius)
             {
                 //TODO: Player Explosion Logic
-
-                GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
-                if (status.situation > 1) {
+                float factor = (explosionRadius - Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position)) / explosionRadius;
+                Debug.Log(GameObject.FindGameObjectWithTag("Player").name);
+                GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>().itemHit(30*factor);
+                if (status.situation > 1)
+                {
                     status.situation = 1;
                     status.detail = 1;
                 }
             }
+            exploded = true;
+            
         }
         yield return new WaitForSeconds(2);
+        gameObject.SetActive(false);
 
         //explode end
         status.situation = 10;
@@ -217,20 +228,26 @@ public class Bomb : MonoBehaviour
             {
                 spark[i].SetActive(false);
             }*/
-            exploded = true;
-            gameObject.SetActive(false);
-            if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < 250)
+            Debug.Log("GAAAAAAAAAAAAAAAAAAAAAAH");
+            Debug.Log(Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position));
+            if (Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position) < explosionRadius)
             {
                 //TODO: Player Explosion Logic
-                GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody>().AddForce(transform.up * 10, ForceMode.Impulse);
-                if (status.situation > 1) {
+                //float factor = (250-Vector3.Distance(GameObject.FindGameObjectWithTag("Player").transform.position, transform.position))/250;
+                Debug.Log(GameObject.FindGameObjectWithTag("Player").name);
+                GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerScript>().itemHit(30);
+                if (status.situation > 1)
+                {
                     status.situation = 1;
                     status.detail = 1;
                 }
             }
+            exploded = true;
+            //gameObject.SetActive(false);
+            
         }
         yield return new WaitForSeconds(2);
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
 
         //explode end
         status.situation = 10;

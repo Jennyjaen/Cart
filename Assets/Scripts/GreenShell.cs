@@ -122,7 +122,7 @@ public class GreenShell : MonoBehaviour
                     }
                     destroyShell();
                 }*/
-                collision.gameObject.GetComponent<PlayerScript>().itemHit(5, collision.GetContact(0).point,2);
+                collision.gameObject.GetComponent<PlayerScript>().itemHit(5);
                 if (lifetime > 0.05f)
                 {
                     destroyShell();

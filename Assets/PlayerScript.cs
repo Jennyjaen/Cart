@@ -665,7 +665,7 @@ public class PlayerScript : MonoBehaviour {
         bananaTimer = 0.5f;
     }
 
-    public void itemHit(float dmg, Vector3 position, float radius) {
+    public void itemHit(float dmg) {
         //GetComponent<Rigidbody>().AddExplosionForce(dmg, position, radius,10);
         GetComponent<Rigidbody>().AddForce(Vector3.up * dmg, ForceMode.Impulse);
     }

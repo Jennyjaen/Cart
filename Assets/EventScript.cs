@@ -39,7 +39,7 @@ public class EventScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log($"situation : {situation} , detail: {detail}");
+        //Debug.Log($"situation : {situation} , detail: {detail}");
     }
 
     private void OnCollisionEnter(Collision collision) {
