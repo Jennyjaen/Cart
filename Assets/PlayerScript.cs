@@ -673,6 +673,14 @@ public class PlayerScript : MonoBehaviour {
     private void OnValidate()
     {
         transform.position = GameObject.Find("P_" + zone.ToString()).transform.position;
+        Banana[] bananas = FindObjectsOfType<Banana>();
+
+        // Iterate over each object and destroy it
+        foreach (Banana banana in bananas)
+        {
+            if(!banana.gameObject.name.Contains("New"))
+                Destroy(banana.gameObject);
+        }
 
     }
 }

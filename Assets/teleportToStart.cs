@@ -21,6 +21,15 @@ public class teleportToStart : MonoBehaviour
         if (other.GetComponent<PlayerScript>() != null) {
             var prevPos = other.gameObject.transform.position;
             other.gameObject.transform.position = new Vector3(prevPos.x, prevPos.y, 650);
+
+            Banana[] bananas = FindObjectsOfType<Banana>();
+
+            // Iterate over each object and destroy it
+            foreach (Banana banana in bananas)
+            {
+                if (!banana.gameObject.name.Contains("New"))
+                    Destroy(banana.gameObject);
+            }
         }
     }
 }

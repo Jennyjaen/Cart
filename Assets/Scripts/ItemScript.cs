@@ -69,10 +69,15 @@ public class ItemScript : MonoBehaviour
                 status.situation = 5;
                 status.detail = 1;
             }
-            index = Random.Range(0, itemGameobjects.Length);
             //index = 0;
-            if (player.zone == Zone.Throw) index = Random.Range(1, itemGameobjects.Length);
-            if (player.zone == Zone.Boost) index = 0;
+            if (player.zone == Zone.Throw)
+            {
+                index += 1; if (index >= itemGameobjects.Length) index = 1;
+            }
+            else if (player.zone == Zone.Boost)
+            { index = 0; }
+            else 
+                index = Random.Range(0, itemGameobjects.Length);
             yourSprite.sprite = itemSprites[index];
             yield return new WaitForSeconds(4f);
 
